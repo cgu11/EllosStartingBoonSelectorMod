@@ -4,7 +4,8 @@ local config = {
   showPreview = true,
   showChaosPreview = false,
   showNextRoomPreview = false,
-  chaosFiltersActive = false
+  chaosFiltersActive = false,
+  boonRarityFiltersActive = false,
 }
 EllosBoonSelectorMod.config = config
 
@@ -208,8 +209,12 @@ function OpenSeedControlScreen( args )
     })
 
   components.FiltersTitle = CreateScreenComponent({ Name = "BlankObstacle", Scale = 1.0, Group = "Combat_Menu", X = 475, Y = 520 })
+  local displayText = "Filter for a Specific God"
+  if EllosBoonSelectorMod.config.boonRarityFiltersActive then 
+    displayText = displayText.." and Boon"
+  end
   CreateTextBox({ Id = components.FiltersTitle.Id,
-      Text = "Filter for a Specific God and Boon",
+      Text = displayText,
       OffsetX = 0, OffsetY = -100,
       FontSize = 28,
       Color = Color.White,
@@ -279,28 +284,30 @@ function OpenSeedControlScreen( args )
   -- Rarity filter buttons
   x = -250
   y = 150
-  for _, priorityBoon in pairs({"Attack", "Special", "Dash", "Cast"}) do
-    components[priorityBoon .. "Filter"] = CreateScreenComponent({ Name = "ButtonDefault", Scale = 0.5, Group = "Combat_Menu", X = 500 + x, Y = 450 + y })
-    components[priorityBoon .. "Filter"].OnPressedFunctionName = "CycleRarityFilter"
-    components[priorityBoon .. "Filter"].PriorityBoon = EllosBoonSelectorMod.PriorityBoonCannonicalNameToCodeName[priorityBoon]
-    CreateTextBox({ Id = components[priorityBoon .. "Filter"].Id,
-        Text = priorityBoon,
-        OffsetX = 0, OffsetY = 0,
-        FontSize = 16,
-        Color = Color.White,
-        Font = "AlegreyaSansSCRegular",
-        ShadowBlur = 0, ShadowColor = {0,0,0,1}, ShadowOffset={0, 2},
-        Justification = "Center",
-        DataProperties =
-        {
-          OpacityWithOwner = true,
-        },
-      })
-    x = x + 150
-    if x > 250 then
-      x = -250
-      y = y + 60
-    end
+  if EllosBoonSelectorMod.config.boonRarityFiltersActive then
+      for _, priorityBoon in pairs({"Attack", "Special", "Dash", "Cast"}) do
+        components[priorityBoon .. "Filter"] = CreateScreenComponent({ Name = "ButtonDefault", Scale = 0.5, Group = "Combat_Menu", X = 500 + x, Y = 450 + y })
+        components[priorityBoon .. "Filter"].OnPressedFunctionName = "CycleRarityFilter"
+        components[priorityBoon .. "Filter"].PriorityBoon = EllosBoonSelectorMod.PriorityBoonCannonicalNameToCodeName[priorityBoon]
+        CreateTextBox({ Id = components[priorityBoon .. "Filter"].Id,
+            Text = priorityBoon,
+            OffsetX = 0, OffsetY = 0,
+            FontSize = 16,
+            Color = Color.White,
+            Font = "AlegreyaSansSCRegular",
+            ShadowBlur = 0, ShadowColor = {0,0,0,1}, ShadowOffset={0, 2},
+            Justification = "Center",
+            DataProperties =
+            {
+              OpacityWithOwner = true,
+            },
+          })
+        x = x + 150
+        if x > 250 then
+          x = -250
+          y = y + 60
+        end
+      end
   end
 
   -- Hammer filter button
@@ -552,8 +559,10 @@ function ClearFilters ( screen, button )
       ModifyTextBox({ Id = screen.Components[location .. "Filter"].Id, Color = Color.BoonPatchCommon })
     end
   end
-  for _, priorityBoon in pairs({"Attack", "Special", "Dash", "Cast"}) do
-    ModifyTextBox({ Id = screen.Components[priorityBoon .. "Filter"].Id, Color = Color.BoonPatchCommon })
+  if EllosBoonSelectorMod.config.boonRarityFiltersActive then
+    for _, priorityBoon in pairs({"Attack", "Special", "Dash", "Cast"}) do
+      ModifyTextBox({ Id = screen.Components[priorityBoon .. "Filter"].Id, Color = Color.BoonPatchCommon })
+    end
   end
 end
 
